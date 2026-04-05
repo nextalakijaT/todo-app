@@ -3,7 +3,6 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo').default || require('connect-mongo');
 const morgan = require('morgan');
 const path = require('path');
-require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
 const todoRoutes = require('./routes/todoRoutes');
