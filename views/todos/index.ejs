@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Todos</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+    h1 { display: flex; justify-content: space-between; align-items: center; }
+    h1 a { font-size: 14px; color: #f44336; text-decoration: none; }
+    .create-form { display: flex; gap: 10px; margin-bottom: 20px; }
+    .create-form input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    .create-form button { padding: 10px 20px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    .filters { display: flex; gap: 16px; margin-bottom: 16px; }
+    .filters a { text-decoration: none; color: #555; padding: 6px 12px; border-radius: 4px; }
+    .filters a.active { background: #2196F3; color: white; }
+    .todo { display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #ddd; margin: 8px 0; border-radius: 6px; }
+    .todo.completed { background: #f9f9f9; }
+    .todo.completed .title { text-decoration: line-through; color: #999; }
+    .actions { display: flex; gap: 8px; }
+    .btn-complete { padding: 6px 12px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    .btn-delete { padding: 6px 12px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    .empty { color: #999; text-align: center; margin-top: 40px; }
+  </style>
+</head>
+<body>
+  <h1>My Todos <a href="/logout">Logout</a></h1>
+
+  <!-- Create new todo -->
+  <form class="create-form" method="POST" action="/todos">
+    <input type="text" name="title" placeholder="What do you need to do?" required />
+    <button type="submit">Add Task</button>
+  </form>
+
+  <!-- Filter tabs -->
+  <div class="filters">
+    <a href="/todos" class="<%= filter === 'all' ? 'active' : '' %>">All</a>
+    <a href="/todos?filter=pending" class="<%= filter === 'pending' ? 'active' : '' %>">Pending</a>
+    <a href="/todos?filter=completed" class="<%= filter === 'completed' ? 'active' : '' %>">Completed</a>
+  </div>
+
+  <!-- Todo list -->
+  <% if (todos.length === 0) { %>
+    <p class="empty">No tasks here. Add one above!</p>
+  <% } %>
+
+  <% todos.forEach(todo => { %>
+    <div class="todo <%= todo.status %>">
+      <span class="title"><%= todo.title %></span>
+      <div class="actions">
+        <% if (todo.status === 'pending') { %>
+          <form method="POST" action="/todos/<%= todo._id %>">
+            <input type="hidden" name="status" value="completed" />
+            <button class="btn-complete">✓ Done</button>
+          </form>
+        <% } %>
+        <form method="POST" action="/todos/<%= todo._id %>">
+          <input type="hidden" name="status" value="deleted" />
+          <button class="btn-delete">✕ Delete</button>
+        </form>
+      </div>
+    </div>
+  <% }) %>
+</body>
+</html>
