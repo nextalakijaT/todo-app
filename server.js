@@ -3,6 +3,7 @@ const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const app = require('./app');
 const connectDB = require('./config/db');
+const startCronJobs = require('./utils/cronJobs');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 3000;
