@@ -1,45 +1,51 @@
 const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
+let transporter;
+
+const getTransporter = async () => {
+  if (transporter) return transporter;
+  
+  const testAccount = await nodemailer.createTestAccount();
+  transporter = nodemailer.createTransport({
+    host: 'smtp.ethereal.email',
+    port: 587,
+    auth: {
+      user: testAccount.user,
+      pass: testAccount.pass
+    }
+  });
+
+  console.log('[EMAIL] Ethereal test account created:', testAccount.user);
+  return transporter;
+};
 
 const sendOverdueEmail = async (toEmail, taskTitle) => {
   try {
-    await transporter.sendMail({
-      from: `"Todo App" <${process.env.EMAIL_USER}>`,
+    const transport = await getTransporter();
+    const info = await transport.sendMail({
+      from: '"Todo App" <todoapp@test.com>',
       to: toEmail,
       subject: '⚠️ Task Overdue',
-      html: `
-        <h2>Task Overdue</h2>
-        <p>Your task <strong>"${taskTitle}"</strong> is now overdue.</p>
-        <p>Log in to your todo app to update it.</p>
-      `
+      html: `<h2>Task "${taskTitle}" is now overdue!</h2>`
     });
-    console.log(`[EMAIL] Overdue email sent for task: ${taskTitle}`);
+    console.log(`[EMAIL] Overdue email sent. Preview: ${nodemailer.getTestMessageUrl(info)}`);
   } catch (err) {
-    console.error('[EMAIL] Failed to send email:', err.message);
+    console.error('[EMAIL] Failed:', err.message);
   }
 };
 
 const sendCompletedEmail = async (toEmail, taskTitle) => {
   try {
-    await transporter.sendMail({
-      from: `"Todo App" <${process.env.EMAIL_USER}>`,
+    const transport = await getTransporter();
+    const info = await transport.sendMail({
+      from: '"Todo App" <todoapp@test.com>',
       to: toEmail,
       subject: '✅ Task Completed',
-      html: `
-        <h2>Task Completed</h2>
-        <p>You completed the task <strong>"${taskTitle}"</strong>. Great work!</p>
-      `
+      html: `<h2>You completed "${taskTitle}"!</h2>`
     });
-    console.log(`[EMAIL] Completion email sent for task: ${taskTitle}`);
+    console.log(`[EMAIL] Completion email sent. Preview: ${nodemailer.getTestMessageUrl(info)}`);
   } catch (err) {
-    console.error('[EMAIL] Failed to send email:', err.message);
+    console.error('[EMAIL] Failed:', err.message);
   }
 };
 
