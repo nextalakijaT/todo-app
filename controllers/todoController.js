@@ -47,10 +47,6 @@ const createTodo = async (req, res, next) => {
     next(err);
   }
 };
-
-const { sendCompletedEmail } = require('../utils/mailer');
-const User = require('../models/User');
-
 const updateStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
