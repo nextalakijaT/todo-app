@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html>
+  const { username, password, email } = req.body;
+const user = await User.create({ username, password, email });
 <head>
   <title>Sign Up</title>
   <style>
@@ -22,4 +24,5 @@
   </form>
   <a href="/login">Already have an account? Log in</a>
 </body>
+
 </html>

@@ -6,11 +6,15 @@ const todoSchema = new mongoose.Schema({
     required: [true, 'Task title is required'],
     trim: true
   },
-  status: {
-    type: String,
-    enum: ['pending', 'completed', 'deleted'],
-    default: 'pending'
-  },
+ status: {
+  type: String,
+  enum: ['pending', 'completed', 'deleted', 'overdue'],
+  default: 'pending'
+},
+dueDate: {
+  type: Date,
+  required: [true, 'Due date is required']
+},
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

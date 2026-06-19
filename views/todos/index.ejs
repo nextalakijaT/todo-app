@@ -26,16 +26,19 @@
 
   <!-- Create new todo -->
   <form class="create-form" method="POST" action="/todos">
-    <input type="text" name="title" placeholder="What do you need to do?" required />
-    <button type="submit">Add Task</button>
-  </form>
+  <input type="text" name="title" placeholder="What do you need to do?" required />
+  <input type="date" name="dueDate" required />
+  <button type="submit">Add Task</button>
+</form>
+  
 
   <!-- Filter tabs -->
   <div class="filters">
-    <a href="/todos" class="<%= filter === 'all' ? 'active' : '' %>">All</a>
-    <a href="/todos?filter=pending" class="<%= filter === 'pending' ? 'active' : '' %>">Pending</a>
-    <a href="/todos?filter=completed" class="<%= filter === 'completed' ? 'active' : '' %>">Completed</a>
-  </div>
+  <a href="/todos" class="<%= filter === 'all' ? 'active' : '' %>">All</a>
+  <a href="/todos?filter=pending" class="<%= filter === 'pending' ? 'active' : '' %>">Pending</a>
+  <a href="/todos?filter=completed" class="<%= filter === 'completed' ? 'active' : '' %>">Completed</a>
+  <a href="/todos?filter=overdue" class="<%= filter === 'overdue' ? 'active' : '' %>">Overdue</a>
+</div>
 
   <!-- Todo list -->
   <% if (todos.length === 0) { %>
@@ -43,21 +46,56 @@
   <% } %>
 
   <% todos.forEach(todo => { %>
-    <div class="todo <%= todo.status %>">
+  <div class="todo <%= todo.status %>">
+    <div>
       <span class="title"><%= todo.title %></span>
-      <div class="actions">
-        <% if (todo.status === 'pending') { %>
-          <form method="POST" action="/todos/<%= todo._id %>">
-            <input type="hidden" name="status" value="completed" />
-            <button class="btn-complete">✓ Done</button>
-          </form>
-        <% } %>
-        <form method="POST" action="/todos/<%= todo._id %>">
-          <input type="hidden" name="status" value="deleted" />
-          <button class="btn-delete">✕ Delete</button>
-        </form>
-      </div>
+      <small style="display:block; color:#999;">
+        Due: <%= new Date(todo.dueDate).toLocaleDateString() %>
+      </small>
     </div>
+    <div class="actions">
+      <% if (todo.status === 'pending' || todo.status === 'overdue') { %>
+        <form method="POST" action="/todos/<%= todo._id %>">
+          <input type="hidden" name="status" value="completed" />
+          <button class="btn-complete">✓ Done</button>
+        </form>
+      <% } %>
+      <form method="POST" action="/todos/<%= todo._id %>">
+        <input type="hidden" name="status" value="deleted" />
+        <button class="btn-delete">✕ Delete</button>
+      </form>
+    </div>
+  </div>
+<% }) %>
   <% }) %>
+  <script>
+  const JWT_TOKEN = '<%= token %>';
+</script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+  // Connect to WebSocket using JWT token
+  const socket = io({
+    auth: { token: JWT_TOKEN }
+  });
+
+  socket.on('connect', () => {
+    console.log('Connected to WebSocket');
+  });
+
+  // Listen for overdue notification
+  socket.on('task:overdue', (data) => {
+    alert(`⚠️ Task "${data.title}" is now overdue!`);
+  });
+
+  // Listen for completed notification
+  socket.on('task:completed', (data) => {
+    alert(`✅ Task "${data.title}" marked as completed!`);
+  });
+
+  socket.on('connect_error', (err) => {
+    console.log('WebSocket connection failed:', err.message);
+  });
+</script>
 </body>
 </html>

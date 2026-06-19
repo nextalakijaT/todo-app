@@ -19,7 +19,6 @@ app.use(morgan('dev'));
 
 // Allows Express to read data sent from HTML forms
 app.use(express.urlencoded({ extended: true }));
-
 // Serves static files like CSS from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 

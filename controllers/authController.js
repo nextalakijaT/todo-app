@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const showSignup = (req, res) => {
@@ -23,6 +24,12 @@ const signup = async (req, res, next) => {
 
     const user = await User.create({ username, password });
     req.session.userId = user._id;
+    const token = jwt.sign(
+  { userId: user._id }, 
+  process.env.JWT_SECRET, 
+  { expiresIn: '1d' }
+);
+req.session.token = token;
 
     console.log(`[AUTH] New user signed up: ${username}`);
     return res.redirect('/todos');
@@ -46,6 +53,12 @@ const login = async (req, res, next) => {
     }
 
     req.session.userId = user._id;
+    const token = jwt.sign(
+  { userId: user._id }, 
+  process.env.JWT_SECRET, 
+  { expiresIn: '1d' }
+);
+req.session.token = token;
     console.log(`[AUTH] User logged in: ${username}`);
     return res.redirect('/todos');
   } catch (err) {
