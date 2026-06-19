@@ -1,4 +1,6 @@
 const Todo = require('../models/Todo');
+const User = require('../models/User');
+const { sendCompletedEmail } = require('../utils/mailer');
 
 const getTodos = async (req, res, next) => {
   try {
@@ -95,3 +97,4 @@ const updateStatus = async (req, res, next) => {
     next(err);
   }
 };
+module.exports = { getTodos, createTodo, updateStatus };
